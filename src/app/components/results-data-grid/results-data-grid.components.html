@@ -1,0 +1,82 @@
+<div class="grid-wrapper">
+  <div class="top-toolbar">
+    <div class="type">
+      <button
+        class="btn"
+        [ngClass]="{'active': type === selectedType}"
+        *ngFor="let type of types"
+        (click)="chnageType($event, type)"
+      >
+        {{type}}'s Results
+      </button>
+    </div>
+    <div class="result">
+      <button class="btn" disabled>Upload File</button>
+    </div>
+  </div>
+
+  <dx-data-grid
+    id="gridContainer"
+    [dataSource]="resultGrid"
+    [showBorders]="true"
+    [allowColumnReordering]="true"
+    [allowColumnResizing]="true"
+  >
+    <dxo-editing
+      mode="row"
+      [allowUpdating]="true"
+      [allowDeleting]="true"
+      [useIcons]="true"
+    ></dxo-editing>
+    <dxo-search-panel
+      [visible]="true"
+      [highlightCaseSensitive]="true"
+    ></dxo-search-panel>
+
+    <dxo-grouping [autoExpandAll]="true"></dxo-grouping>
+
+    <dxi-column dataField="page" [width]="50"></dxi-column>
+    <dxi-column dataField="section"></dxi-column>
+    <dxi-column dataField="drawingCode"></dxi-column>
+    <dxi-column dataField="drawingTitle"></dxi-column>
+    <dxi-column dataField="group" [groupIndex]="0"></dxi-column>
+    <dxi-column dataField="name"></dxi-column>
+    <dxi-column dataField="color" cellTemplate="cellTemplate"></dxi-column>
+
+    <dxi-column
+      dataField="scale"
+      [visible]="lastSelectedColumns?.includes('scale')"
+    ></dxi-column>
+    <dxi-column
+      dataField="length"
+      [visible]="lastSelectedColumns?.includes('length')"
+    ></dxi-column>
+    <dxi-column
+      dataField="ceilingHeight"
+      [visible]="lastSelectedColumns?.includes('ceilingHeight')"
+    ></dxi-column>
+    <dxi-column
+      dataField="type"
+      [visible]="lastSelectedColumns?.includes('type')"
+    ></dxi-column>
+
+    <dxi-column
+      dataField="repeat"
+      [visible]="lastSelectedColumns?.includes('repeat')"
+    ></dxi-column>
+    <dxi-column
+      dataField="comment"
+      [visible]="lastSelectedColumns?.includes('comment')"
+    ></dxi-column>
+
+    <dxo-load-panel [enabled]="true"></dxo-load-panel>
+    <dxo-scrolling mode="virtual"></dxo-scrolling>
+
+    <div
+      *dxTemplate="let data of 'cellTemplate'"
+      [ngStyle]="{'background' : data.value} "
+    >
+      {{ data.value }}
+    </div>
+  </dx-data-grid>
+</div>

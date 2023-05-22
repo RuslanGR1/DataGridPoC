@@ -2,15 +2,27 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
+import { ResultsDataGridComponent } from './components/results-data-grid/results-data-grid.components';
+import {
+  DxBulletModule,
+  DxButtonModule,
+  DxSelectBoxModule,
+  DxTemplateModule,
+} from 'devextreme-angular';
+import { DxDataGridModule } from 'devextreme-angular/ui/data-grid';
 
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
+  declarations: [AppComponent, ResultsDataGridComponent],
   imports: [
-    BrowserModule
+    BrowserModule,
+    DxButtonModule,
+    DxDataGridModule,
+    DxTemplateModule,
+    DxSelectBoxModule,
+    DxButtonModule,
+    DxBulletModule,
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
