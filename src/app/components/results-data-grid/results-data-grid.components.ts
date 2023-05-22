@@ -22,6 +22,7 @@ export class ResultsDataGridComponent {
     ResultAnotationType.WALL,
     ResultAnotationType.ROOM,
     ResultAnotationType.WINDOW,
+    ResultAnotationType.DOOR,
   ];
 
   constructor(private readonly service: ResultsDataGridService) {

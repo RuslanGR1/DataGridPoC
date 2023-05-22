@@ -36,6 +36,7 @@
 
     <dxo-group-panel [visible]="true"></dxo-group-panel>
     <dxo-grouping [autoExpandAll]="true"></dxo-grouping>
+    <dxo-column-chooser [enabled]="true"></dxo-column-chooser>
 
     <dxi-column dataField="page" [width]="50"></dxi-column>
     <dxi-column dataField="section"></dxi-column>
@@ -60,6 +61,19 @@
     <dxi-column
       dataField="type"
       [visible]="lastSelectedColumns?.includes('type')"
+    ></dxi-column>
+
+    <dxi-column
+      dataField="material"
+      [visible]="lastSelectedColumns?.includes('material')"
+    ></dxi-column>
+    <dxi-column
+      dataField="hardware"
+      [visible]="lastSelectedColumns?.includes('hardware')"
+    ></dxi-column>
+    <dxi-column
+      dataField="singleDoule"
+      [visible]="lastSelectedColumns?.includes('singleDoule')"
     ></dxi-column>
 
     <dxi-column

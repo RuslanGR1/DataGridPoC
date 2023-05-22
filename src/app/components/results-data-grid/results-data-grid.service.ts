@@ -6,9 +6,11 @@ import {
   Room,
   Wall,
   Window,
+  Door,
   roomValues,
   wallValues,
   windowValues,
+  doorValues,
 } from './types';
 
 @Injectable({ providedIn: 'root' })
@@ -28,6 +30,7 @@ export class ResultsDataGridService {
     [ResultAnotationType.WALL]: () => this.getWalls(),
     [ResultAnotationType.ROOM]: () => this.getRooms(),
     [ResultAnotationType.WINDOW]: () => this.getWindows(),
+    [ResultAnotationType.DOOR]: () => this.getDoors(),
   };
   getDataByType(type: ResultAnotationType): ResultType[] {
     return this.mapTypeToData[type]();
@@ -37,6 +40,7 @@ export class ResultsDataGridService {
     [ResultAnotationType.WALL]: wallValues,
     [ResultAnotationType.ROOM]: roomValues,
     [ResultAnotationType.WINDOW]: windowValues,
+    [ResultAnotationType.DOOR]: doorValues,
   };
   getColumnsByType(type: ResultAnotationType): string[] {
     return this.mapTypeToColumns[type];
@@ -51,6 +55,40 @@ export class ResultsDataGridService {
       });
     });
     return wall;
+  }
+
+  getDoors(): Door[] {
+    const doors: Door[] = [];
+    results.pageProcessingResults.forEach((result) => {
+      result.doorsDetectionResults.forEach((doorResults) => {
+        doorResults.doorGroups.forEach((doorGroup) => {
+          doorGroup.doors.forEach((_doorId, index) => {
+            doors.push({
+              page: result.pageNumber,
+              section:
+                this.getSectionNameById(
+                  result.pageNumber,
+                  doorGroup.sectionId
+                ) || '',
+              drawingCode: '',
+              drawingTitle: '',
+              name: `Door ${index + 1}`,
+              group: doorGroup.name,
+              color: doorGroup.color,
+              type: '',
+              material: '',
+              width: '',
+              height: '',
+              singleDouble: '',
+              hardware: '',
+              repeat: 1,
+              comment: '',
+            });
+          });
+        });
+      });
+    });
+    return doors;
   }
 
   getRooms(): Room[] {
