@@ -21,6 +21,7 @@
     [showBorders]="true"
     [allowColumnReordering]="true"
     [allowColumnResizing]="true"
+    (onExporting)="onExporting($event)"
   >
     <dxo-editing
       mode="row"
@@ -71,6 +72,7 @@
 
     <dxo-load-panel [enabled]="true"></dxo-load-panel>
     <dxo-scrolling mode="virtual"></dxo-scrolling>
+    <dxo-export [enabled]="true" [allowExportSelectedData]="true"></dxo-export>
 
     <div
       *dxTemplate="let data of 'cellTemplate'"

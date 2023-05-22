@@ -23,6 +23,7 @@
     "useDefineForClassFields": false,
     "lib": ["ES2022", "dom"],
     "paths": {
+      "exceljs": ["node_modules/exceljs/dist/exceljs.min"],
       "jszip": ["node_modules/jszip/dist/jszip.min.js"]
     }
   },
