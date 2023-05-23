@@ -6,7 +6,7 @@ import { ResultAnotationType, ResultType } from './types';
 import { exportDataGrid } from 'devextreme/excel_exporter';
 import assetsResults from '../../../assets/results.json';
 import { Workbook } from 'exceljs';
-import * as fs from 'file-saver';
+import fs from 'file-saver';
 
 @Component({
   selector: 'results-data-grid',
@@ -18,8 +18,8 @@ export class ResultsDataGridComponent {
 
   resultsData: any = null;
   lastSelectedColumns: (string | undefined)[] | undefined = [];
-  selectedType: ResultAnotationType = ResultAnotationType.WALL;
   defaultAnnotationType: ResultAnotationType = ResultAnotationType.WALL;
+  selectedType: ResultAnotationType = this.defaultAnnotationType;
   resultGrid: ResultType[] = [];
   types = [ResultAnotationType.WALL, ResultAnotationType.ROOM, ResultAnotationType.WINDOW, ResultAnotationType.DOOR];
 
@@ -50,6 +50,18 @@ export class ResultsDataGridComponent {
     const reader = new FileReader();
     reader.onload = this.onReaderLoad;
     reader.readAsText(file);
+  }
+
+  calculateSelectedRow(options: any) {
+    if (options.name === 'SelectedRowsSummary') {
+      if (options.summaryProcess === 'start') {
+        options.totalValue = 0;
+      } else if (options.summaryProcess === 'calculate') {
+        if (options.component.isRowSelected(options.value.ID)) {
+          options.totalValue += options.value.area;
+        }
+      }
+    }
   }
 
   onReaderLoad = (ev: ProgressEvent<FileReader>) => {

@@ -51,9 +51,12 @@
 
     <dxi-column dataField="scale" [visible]="lastSelectedColumns?.includes('scale')"></dxi-column>
     <dxi-column dataField="length" [visible]="lastSelectedColumns?.includes('length')"></dxi-column>
+
     <dxi-column dataField="ceilingHeight" [visible]="lastSelectedColumns?.includes('ceilingHeight')"></dxi-column>
     <dxi-column dataField="type" [visible]="lastSelectedColumns?.includes('type')"></dxi-column>
-
+    <dxi-column dataField="height" [visible]="lastSelectedColumns?.includes('height')"></dxi-column>
+    <dxi-column dataField="width" [visible]="lastSelectedColumns?.includes('width')"></dxi-column>
+    <dxi-column dataField="area" [visible]="lastSelectedColumns?.includes('area')"></dxi-column>
     <dxi-column dataField="doorLeft" [visible]="lastSelectedColumns?.includes('doorLeft')"></dxi-column>
     <dxi-column dataField="material" [visible]="lastSelectedColumns?.includes('material')"></dxi-column>
     <dxi-column dataField="hardware" [visible]="lastSelectedColumns?.includes('hardware')"></dxi-column>
@@ -69,11 +72,32 @@
     <dxo-load-panel [enabled]="true"></dxo-load-panel>
     <dxo-scrolling mode="virtual"></dxo-scrolling>
     <dxo-export [enabled]="true" [allowExportSelectedData]="true"></dxo-export>
+    <dxo-summary [calculateCustomSummary]="calculateSelectedRow" [recalculateWhileEditing]="true">
+      <dxi-group-item
+        column="area"
+        summaryType="custom"
+        [showInGroupFooter]="false"
+        [alignByColumn]="true"
+      ></dxi-group-item>
+    </dxo-summary>
 
-    <dxo-summary>
+    <dxo-summary [recalculateWhileEditing]="true">
       <dxi-group-item column="length" summaryType="count" displayFormat="{0}"> </dxi-group-item>
       <dxi-group-item column="length" summaryType="sum" [showInGroupFooter]="false" [alignByColumn]="true">
       </dxi-group-item>
+
+      <dxi-group-item
+        column="height"
+        summaryType="sum"
+        [showInGroupFooter]="false"
+        [alignByColumn]="true"
+      ></dxi-group-item>
+      <dxi-group-item
+        column="width"
+        summaryType="sum"
+        [showInGroupFooter]="false"
+        [alignByColumn]="true"
+      ></dxi-group-item>
     </dxo-summary>
 
     <div *dxTemplate="let data of 'cellTemplate'" [ngStyle]="{'background' : data.value} ">{{ data.value }}</div>

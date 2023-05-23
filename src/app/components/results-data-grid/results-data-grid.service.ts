@@ -13,6 +13,11 @@ import {
   doorValues
 } from './types';
 
+export interface Point {
+  x: number;
+  y: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ResultsDataGridService {
   private getSectionNameById(pageNumber: number, id: string, results: any) {
@@ -61,6 +66,15 @@ export class ResultsDataGridService {
     return _.get(wallsObject, wallId);
   }
 
+  private getRoomById(roomId: string, results: any) {
+    const pageRoomDetectionResults = results.pageProcessingResults.map(
+      (pageResult: any) => pageResult.wallsDetectionResults
+    );
+    const roomsObject = {};
+    _.flatten<any>(pageRoomDetectionResults).forEach((result) => Object.assign(roomsObject, result.rooms.roomsResults));
+    return _.get(roomsObject, roomId);
+  }
+
   private getLenghtByJointIds(j1Id: string, j2Id: string, results: any) {
     const pageWallDetectionResults = results.pageProcessingResults.map(
       (pageResult: any) => pageResult.wallsDetectionResults
@@ -74,7 +88,34 @@ export class ResultsDataGridService {
     const a = x1 - x2;
     const b = y1 - y2;
     const rawLenght = Math.sqrt(a * a + b * b);
-    return Math.ceil(rawLenght * 100) / 100;
+    return Math.floor(rawLenght * 100) / 100;
+  }
+
+  getJointsCoords(jointIds: string[], results: any): Point[] {
+    const pageWallDetectionResults = results.pageProcessingResults.map(
+      (pageResult: any) => pageResult.wallsDetectionResults
+    );
+    const jointsObject = {};
+    _.flatten<any>(pageWallDetectionResults).forEach((result) =>
+      Object.assign(jointsObject, result.joints.jointsResults)
+    );
+    const points = jointIds?.map((jointId) => _.get(jointsObject, jointId));
+    return points;
+  }
+
+  calculatePolygonArea(points: Point[]): number {
+    if (points.length < 3) {
+      return 0;
+    }
+
+    let area = 0;
+    const n = points.length;
+    for (let i = 0; i < n; i++) {
+      const j = (i + 1) % n;
+      area += points[i].x * points[j].y - points[j].x * points[i].y;
+    }
+
+    return Math.abs(area / 2) * 1000;
   }
 
   getDoors(results: any): Door[] {
@@ -99,8 +140,8 @@ export class ResultsDataGridService {
               type: doorGroup.doorType,
               doorLeft: door.doorLeft,
               material: doorGroup.doorMaterial,
-              width: '',
-              height: '',
+              width: door.boundingBox.width,
+              height: door.boundingBox.height,
               singleDouble: door.doorSingle,
               hardware: doorGroup.doorHardware,
               repeat: section.numberOfReportEntries,
@@ -118,8 +159,11 @@ export class ResultsDataGridService {
     results.pageProcessingResults?.forEach((result: any) => {
       result.roomsDetectionResults?.forEach((roomResults: any) => {
         roomResults.roomGroups?.forEach((roomGroup: any) => {
-          roomGroup.rooms?.forEach((_roomId: string, index: number) => {
+          roomGroup.rooms?.forEach((roomId: string, index: number) => {
             const section = this.getSectionNameById(result.pageNumber, roomGroup.sectionId, results);
+            const { joints, name } = this.getRoomById(roomId, results);
+            const points = this.getJointsCoords(joints, results);
+            const area = this.calculatePolygonArea(points);
             if (!section) {
               return;
             }
@@ -128,12 +172,12 @@ export class ResultsDataGridService {
               section: section.name,
               drawingCode: '',
               drawingTitle: '',
-              name: `Room ${index + 1}`,
+              name: name || `Room ${index + 1}`,
               group: roomGroup.name,
               color: roomGroup.color,
               scale: section.scale,
               ceilingHeight: roomGroup.height || '',
-              area: '',
+              area: Math.floor(area * 100) / 100,
               exclusionArea: ''
             });
           });

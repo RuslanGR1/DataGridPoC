@@ -8,7 +8,7 @@ export interface Room {
   color: string;
   scale: number | undefined;
   ceilingHeight: string;
-  area: string;
+  area: number;
   exclusionArea: string;
 }
 
