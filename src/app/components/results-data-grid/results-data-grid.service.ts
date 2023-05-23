@@ -1,5 +1,5 @@
+import * as _ from 'lodash';
 import { Injectable } from '@angular/core';
-import results from '../../../assets/results.json';
 import {
   ResultAnotationType,
   ResultType,
@@ -10,79 +10,101 @@ import {
   roomValues,
   wallValues,
   windowValues,
-  doorValues,
+  doorValues
 } from './types';
 
 @Injectable({ providedIn: 'root' })
 export class ResultsDataGridService {
-  private getSectionNameById(pageNumber: number, id: string): string | void {
+  private getSectionNameById(pageNumber: number, id: string, results: any) {
     const params = results.documentProcessingParams.pageProcessingModels.find(
-      (model) => model.pageNumber === pageNumber
+      (model: any) => model.pageNumber === pageNumber
     );
-    const section = params?.pageSections.find((section) => section.id === id);
-    return section?.name;
+    const section = params?.pageSections.find((section: any) => section.id === id);
+    return section;
   }
 
-  private readonly mapTypeToData: Record<
-    ResultAnotationType,
-    () => ResultType[]
-  > = {
-    [ResultAnotationType.WALL]: () => this.getWalls(),
-    [ResultAnotationType.ROOM]: () => this.getRooms(),
-    [ResultAnotationType.WINDOW]: () => this.getWindows(),
-    [ResultAnotationType.DOOR]: () => this.getDoors(),
+  private readonly mapTypeToData: Record<ResultAnotationType, (res: any) => ResultType[]> = {
+    [ResultAnotationType.WALL]: (res) => this.getWalls(res),
+    [ResultAnotationType.ROOM]: (res) => this.getRooms(res),
+    [ResultAnotationType.WINDOW]: (res) => this.getWindows(res),
+    [ResultAnotationType.DOOR]: (res) => this.getDoors(res)
   };
-  getDataByType(type: ResultAnotationType): ResultType[] {
-    return this.mapTypeToData[type]();
+  getDataByType(type: ResultAnotationType, results: any): ResultType[] {
+    return this.mapTypeToData[type](results);
   }
 
   private readonly mapTypeToColumns: Record<ResultAnotationType, string[]> = {
     [ResultAnotationType.WALL]: wallValues,
     [ResultAnotationType.ROOM]: roomValues,
     [ResultAnotationType.WINDOW]: windowValues,
-    [ResultAnotationType.DOOR]: doorValues,
+    [ResultAnotationType.DOOR]: doorValues
   };
   getColumnsByType(type: ResultAnotationType): string[] {
     return this.mapTypeToColumns[type];
   }
 
-  private getWallById(wallId: string) {
-    let wall: any;
-    results.pageProcessingResults.forEach((page) => {
-      page.wallsDetectionResults.forEach((wall) => {
-        // @ts-ignore
-        wall = wall?.walls?.wallsResults[wallId];
-      });
-    });
-    return wall;
+  private getDoorById(doorId: string, results: any) {
+    const pageDoorDetectionResults = results.pageProcessingResults.map(
+      (pageResult: any) => pageResult.doorsDetectionResults
+    );
+    const doors = _.flatten(pageDoorDetectionResults).map((result: any) => result.doorsResults);
+    const door = _.flatten(doors).find((res) => res.id === doorId);
+    return door;
   }
 
-  getDoors(): Door[] {
+  private getWallById(wallId: string, results: any) {
+    const pageWallDetectionResults = results.pageProcessingResults.map(
+      (pageResult: any) => pageResult.wallsDetectionResults
+    );
+    const wallsObject = {};
+    _.flatten<any>(pageWallDetectionResults).forEach((result) => Object.assign(wallsObject, result.walls.wallsResults));
+    return _.get(wallsObject, wallId);
+  }
+
+  private getLenghtByJointIds(j1Id: string, j2Id: string, results: any) {
+    const pageWallDetectionResults = results.pageProcessingResults.map(
+      (pageResult: any) => pageResult.wallsDetectionResults
+    );
+    const jointsObject = {};
+    _.flatten<any>(pageWallDetectionResults).forEach((result) =>
+      Object.assign(jointsObject, result.joints.jointsResults)
+    );
+    const { x: x1, y: y1 } = _.get(jointsObject, j1Id);
+    const { x: x2, y: y2 } = _.get(jointsObject, j2Id);
+    const a = x1 - x2;
+    const b = y1 - y2;
+    const rawLenght = Math.sqrt(a * a + b * b);
+    return Math.ceil(rawLenght * 100) / 100;
+  }
+
+  getDoors(results: any): Door[] {
     const doors: Door[] = [];
-    results.pageProcessingResults.forEach((result) => {
-      result.doorsDetectionResults.forEach((doorResults) => {
-        doorResults.doorGroups.forEach((doorGroup) => {
-          doorGroup.doors.forEach((_doorId, index) => {
+    results.pageProcessingResults?.forEach((result: any) => {
+      result.doorsDetectionResults?.forEach((doorResults: any) => {
+        doorResults.doorGroups?.forEach((doorGroup: any) => {
+          doorGroup.doors?.forEach((doorId: string) => {
+            const door = this.getDoorById(doorId, results);
+            const section = this.getSectionNameById(result.pageNumber, doorGroup.sectionId, results);
+            if (!section || !door) {
+              return;
+            }
             doors.push({
               page: result.pageNumber,
-              section:
-                this.getSectionNameById(
-                  result.pageNumber,
-                  doorGroup.sectionId
-                ) || '',
+              section: section.name,
               drawingCode: '',
               drawingTitle: '',
-              name: `Door ${index + 1}`,
+              name: `Door ${door.number}`,
               group: doorGroup.name,
               color: doorGroup.color,
-              type: '',
-              material: '',
+              type: doorGroup.doorType,
+              doorLeft: door.doorLeft,
+              material: doorGroup.doorMaterial,
               width: '',
               height: '',
-              singleDouble: '',
-              hardware: '',
-              repeat: 1,
-              comment: '',
+              singleDouble: door.doorSingle,
+              hardware: doorGroup.doorHardware,
+              repeat: section.numberOfReportEntries,
+              comment: ''
             });
           });
         });
@@ -91,28 +113,28 @@ export class ResultsDataGridService {
     return doors;
   }
 
-  getRooms(): Room[] {
+  getRooms(results: any): Room[] {
     const rooms: Room[] = [];
-    results.pageProcessingResults.forEach((result) => {
-      result.roomsDetectionResults.forEach((roomResults) => {
-        roomResults.roomGroups.forEach((roomGroup) => {
-          roomGroup.rooms.forEach((_roomId, index) => {
+    results.pageProcessingResults?.forEach((result: any) => {
+      result.roomsDetectionResults?.forEach((roomResults: any) => {
+        roomResults.roomGroups?.forEach((roomGroup: any) => {
+          roomGroup.rooms?.forEach((_roomId: string, index: number) => {
+            const section = this.getSectionNameById(result.pageNumber, roomGroup.sectionId, results);
+            if (!section) {
+              return;
+            }
             rooms.push({
               page: result.pageNumber,
-              section:
-                this.getSectionNameById(
-                  result.pageNumber,
-                  roomGroup.sectionId
-                ) || '',
+              section: section.name,
               drawingCode: '',
               drawingTitle: '',
               name: `Room ${index + 1}`,
               group: roomGroup.name,
               color: roomGroup.color,
-              scale: '',
+              scale: section.scale,
               ceilingHeight: roomGroup.height || '',
               area: '',
-              exclusionArea: '',
+              exclusionArea: ''
             });
           });
         });
@@ -121,26 +143,26 @@ export class ResultsDataGridService {
     return rooms;
   }
 
-  getWindows(): Window[] {
+  getWindows(results: any): Window[] {
     let windows: Window[] = [];
-    results.pageProcessingResults.forEach((result) => {
-      result.windowsDetectionResults.forEach((windowResults) => {
-        windowResults.windowGroups.forEach((windowGroup) => {
-          windowGroup.windows.forEach((_windowId, index) => {
+    results.pageProcessingResults?.forEach((result: any) => {
+      result.windowsDetectionResults?.forEach((windowResults: any) => {
+        windowResults.windowGroups?.forEach((windowGroup: any) => {
+          windowGroup.windows?.forEach((_windowId: string, index: number) => {
+            const section = this.getSectionNameById(result.pageNumber, windowGroup.sectionId, results);
+            if (!section) {
+              return;
+            }
             windows.push({
               page: result.pageNumber,
-              section:
-                this.getSectionNameById(
-                  result.pageNumber,
-                  windowGroup.sectionId
-                ) || '',
+              section: section.name,
               drawingCode: '',
               drawingTitle: '',
               name: `Window ${index + 1}`,
               group: windowGroup.name,
               color: windowGroup.color,
-              repeat: 3,
-              comment: '',
+              repeat: section?.numberOfReportEntries,
+              comment: ''
             });
           });
         });
@@ -149,31 +171,31 @@ export class ResultsDataGridService {
     return windows;
   }
 
-  getWalls(): Wall[] {
+  getWalls(results: any): Wall[] {
     let walls: Wall[] = [];
-    results.pageProcessingResults.map((result) => {
-      let wallObject: Wall;
-      result.wallsDetectionResults.forEach((wallsResult) => {
-        wallsResult.customWallGroups.forEach((wallGroup) => {
-          wallGroup.walls.forEach((_wallId, index) => {
-            wallObject = {
+    results.pageProcessingResults?.forEach((result: any) => {
+      result.wallsDetectionResults?.forEach((wallsResult: any) => {
+        wallsResult.customWallGroups?.forEach((wallGroup: any) => {
+          wallGroup.walls?.forEach((wallId: string, index: number) => {
+            const { j1, j2 } = this.getWallById(wallId, results);
+            const lenght = this.getLenghtByJointIds(j1, j2, results);
+            const section = this.getSectionNameById(result.pageNumber, wallGroup.sectionId, results);
+            if (!section) {
+              return;
+            }
+            walls.push({
               page: result.pageNumber,
-              section:
-                this.getSectionNameById(
-                  result.pageNumber,
-                  wallGroup.sectionId
-                ) || '',
+              section: section.name,
               drawingCode: '',
               drawingTitle: '',
               name: `Wall ${index + 1}`,
               group: wallGroup.name,
               color: wallGroup?.color,
-              scale: '',
-              length: '',
+              scale: section.scale * section.scale,
+              length: lenght,
               ceilingHeight: wallGroup?.height,
-              type: wallGroup.type,
-            };
-            walls.push(wallObject);
+              type: wallGroup.type
+            });
           });
         });
       });

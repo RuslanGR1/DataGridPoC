@@ -7,6 +7,7 @@ export interface Door {
   name: string;
   color: string;
   type: string;
+  doorLeft: string;
   material: string;
   width: string;
   height: string;
@@ -28,6 +29,7 @@ export const doorValues = [
   'material',
   'width',
   'height',
+  'doorLeft',
   'hardware',
   'singleDouble',
   'repeat',

@@ -6,8 +6,8 @@ export interface Wall {
   group: string;
   name: string;
   color: string;
-  scale: string;
-  length: string;
+  scale: number | undefined;
+  length: number;
   ceilingHeight: string;
   type: string;
 }
@@ -23,5 +23,5 @@ export const wallValues = [
   'scale',
   'length',
   'ceilingHeight',
-  'type',
+  'type'
 ];

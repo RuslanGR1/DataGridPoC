@@ -5,13 +5,24 @@
         class="btn"
         [ngClass]="{'active': type === selectedType}"
         *ngFor="let type of types"
-        (click)="chnageType($event, type)"
+        (click)="changeResultType($event, type)"
       >
         {{type}}'s Results
       </button>
     </div>
     <div class="result">
-      <button class="btn" disabled>Upload File</button>
+      <div class="file-wrapper">
+        <input
+          #imageInput
+          type="file"
+          accept="appication/json"
+          (change)="processFile(imageInput)"
+          id="actual-btn"
+          onclick="this.value=null;"
+          hidden
+        />
+        <label class="btn" for="actual-btn">Upload File</label>
+      </div>
     </div>
   </div>
 
@@ -23,77 +34,48 @@
     [allowColumnResizing]="true"
     (onExporting)="onExporting($event)"
   >
-    <dxo-editing
-      mode="row"
-      [allowUpdating]="true"
-      [allowDeleting]="true"
-      [useIcons]="true"
-    ></dxo-editing>
-    <dxo-search-panel
-      [visible]="true"
-      [highlightCaseSensitive]="true"
-    ></dxo-search-panel>
+    <dxo-editing mode="row" [allowUpdating]="true" [allowDeleting]="true" [useIcons]="true"></dxo-editing>
+    <dxo-search-panel [visible]="true" [highlightCaseSensitive]="true"></dxo-search-panel>
 
     <dxo-group-panel [visible]="true"></dxo-group-panel>
     <dxo-grouping [autoExpandAll]="true"></dxo-grouping>
     <dxo-column-chooser [enabled]="true"></dxo-column-chooser>
 
-    <dxi-column dataField="page" [width]="50"></dxi-column>
-    <dxi-column dataField="section"></dxi-column>
+    <dxi-column dataField="page" [groupIndex]="0" [width]="50"></dxi-column>
+    <dxi-column dataField="section" [groupIndex]="1"></dxi-column>
     <dxi-column dataField="drawingCode"></dxi-column>
     <dxi-column dataField="drawingTitle"></dxi-column>
-    <dxi-column dataField="group" [groupIndex]="0"></dxi-column>
+    <dxi-column dataField="group" [groupIndex]="2"></dxi-column>
     <dxi-column dataField="name"></dxi-column>
     <dxi-column dataField="color" cellTemplate="cellTemplate"></dxi-column>
 
+    <dxi-column dataField="scale" [visible]="lastSelectedColumns?.includes('scale')"></dxi-column>
+    <dxi-column dataField="length" [visible]="lastSelectedColumns?.includes('length')"></dxi-column>
+    <dxi-column dataField="ceilingHeight" [visible]="lastSelectedColumns?.includes('ceilingHeight')"></dxi-column>
+    <dxi-column dataField="type" [visible]="lastSelectedColumns?.includes('type')"></dxi-column>
+
+    <dxi-column dataField="doorLeft" [visible]="lastSelectedColumns?.includes('doorLeft')"></dxi-column>
+    <dxi-column dataField="material" [visible]="lastSelectedColumns?.includes('material')"></dxi-column>
+    <dxi-column dataField="hardware" [visible]="lastSelectedColumns?.includes('hardware')"></dxi-column>
     <dxi-column
-      dataField="scale"
-      [visible]="lastSelectedColumns?.includes('scale')"
-    ></dxi-column>
-    <dxi-column
-      dataField="length"
-      [visible]="lastSelectedColumns?.includes('length')"
-    ></dxi-column>
-    <dxi-column
-      dataField="ceilingHeight"
-      [visible]="lastSelectedColumns?.includes('ceilingHeight')"
-    ></dxi-column>
-    <dxi-column
-      dataField="type"
-      [visible]="lastSelectedColumns?.includes('type')"
+      dataField="singleDouble"
+      caption="Single/Double"
+      [visible]="lastSelectedColumns?.includes('singleDouble')"
     ></dxi-column>
 
-    <dxi-column
-      dataField="material"
-      [visible]="lastSelectedColumns?.includes('material')"
-    ></dxi-column>
-    <dxi-column
-      dataField="hardware"
-      [visible]="lastSelectedColumns?.includes('hardware')"
-    ></dxi-column>
-    <dxi-column
-      dataField="singleDoule"
-      [visible]="lastSelectedColumns?.includes('singleDoule')"
-    ></dxi-column>
-
-    <dxi-column
-      dataField="repeat"
-      [visible]="lastSelectedColumns?.includes('repeat')"
-    ></dxi-column>
-    <dxi-column
-      dataField="comment"
-      [visible]="lastSelectedColumns?.includes('comment')"
-    ></dxi-column>
+    <dxi-column dataField="repeat" [visible]="lastSelectedColumns?.includes('repeat')"></dxi-column>
+    <dxi-column dataField="comment" [visible]="lastSelectedColumns?.includes('comment')"></dxi-column>
 
     <dxo-load-panel [enabled]="true"></dxo-load-panel>
     <dxo-scrolling mode="virtual"></dxo-scrolling>
     <dxo-export [enabled]="true" [allowExportSelectedData]="true"></dxo-export>
 
-    <div
-      *dxTemplate="let data of 'cellTemplate'"
-      [ngStyle]="{'background' : data.value} "
-    >
-      {{ data.value }}
-    </div>
+    <dxo-summary>
+      <dxi-group-item column="length" summaryType="count" displayFormat="{0}"> </dxi-group-item>
+      <dxi-group-item column="length" summaryType="sum" [showInGroupFooter]="false" [alignByColumn]="true">
+      </dxi-group-item>
+    </dxo-summary>
+
+    <div *dxTemplate="let data of 'cellTemplate'" [ngStyle]="{'background' : data.value} ">{{ data.value }}</div>
   </dx-data-grid>
 </div>

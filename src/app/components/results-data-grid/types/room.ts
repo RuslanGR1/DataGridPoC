@@ -6,7 +6,7 @@ export interface Room {
   group: string;
   name: string;
   color: string;
-  scale: string;
+  scale: number | undefined;
   ceilingHeight: string;
   area: string;
   exclusionArea: string;
@@ -23,5 +23,5 @@ export const roomValues = [
   'scale',
   'ceilingHeight',
   'area',
-  'exclusionArea',
+  'exclusionArea'
 ];
