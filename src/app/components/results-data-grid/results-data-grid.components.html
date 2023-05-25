@@ -119,4 +119,8 @@
 
     <div *dxTemplate="let data of 'cellTemplate'" [ngStyle]="{'background' : data.value} ">{{ data.value }}</div>
   </dx-data-grid>
+  <div class="bottom-line">
+    <button class="btn active" [disabled]="!this.newColumnName" (click)="addEmptyColumn()">Add Empty Column</button>
+    <input class="add-column-input" [(ngModel)]="newColumnName" type="text" />
+  </div>
 </div>

@@ -1,5 +1,5 @@
 ::ng-deep #gridContainer {
-  height: 840px;
+  height: 740px;
 }
 
 #gridContainer {
@@ -23,6 +23,32 @@
   margin: 0 auto;
   width: 80%;
   margin-top: 20px;
+}
+
+.bottom-line {
+  margin-top: 20px;
+  display: flex;
+  gap: 8px;
+}
+
+.add-column-input {
+  display: block;
+  border: none;
+  font-size: 15px;
+  font-weight: 400;
+  border-radius: 5px;
+  padding: 8px 14px;
+  margin-bottom: 5px;
+  color: #212529;
+  background-color: #f8f9fa;
+  font-family: 'Arial', sans-serif;
+  line-height: 1.5;
+}
+
+.add-column-input:focus,
+.add-column-input:active {
+  border: 0;
+  outline: 0;
 }
 
 .btn {

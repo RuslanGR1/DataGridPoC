@@ -22,6 +22,7 @@ export class ResultsDataGridComponent {
   selectedType: ResultAnotationType = this.defaultAnnotationType;
   resultGrid: ResultType[] = [];
   types = [ResultAnotationType.WALL, ResultAnotationType.ROOM, ResultAnotationType.WINDOW, ResultAnotationType.DOOR];
+  newColumnName: string = '';
 
   constructor(readonly service: ResultsDataGridService) {
     this.resultsData = assetsResults;
@@ -91,6 +92,11 @@ export class ResultsDataGridComponent {
         }
       }
     }
+  }
+
+  addEmptyColumn(): void {
+    this.dataGrid?.instance.addColumn(this.newColumnName);
+    this.newColumnName = '';
   }
 
   onReaderLoad = (ev: ProgressEvent<FileReader>) => {
