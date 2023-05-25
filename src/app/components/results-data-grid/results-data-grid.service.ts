@@ -48,6 +48,16 @@ export class ResultsDataGridService {
     return this.mapTypeToColumns[type];
   }
 
+  private readonly mapAnnotationNameByType: Record<ResultAnotationType, string> = {
+    [ResultAnotationType.WALL]: "Wall's Results",
+    [ResultAnotationType.ROOM]: "Room's Results",
+    [ResultAnotationType.WINDOW]: "Window's Results",
+    [ResultAnotationType.DOOR]: "Door's Results"
+  };
+  getAnnotationNameByType(type: ResultAnotationType): string {
+    return this.mapAnnotationNameByType[type];
+  }
+
   private getDoorById(doorId: string, results: any) {
     const pageDoorDetectionResults = results.pageProcessingResults.map(
       (pageResult: any) => pageResult.doorsDetectionResults

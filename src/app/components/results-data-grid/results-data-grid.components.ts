@@ -23,10 +23,21 @@ export class ResultsDataGridComponent {
   resultGrid: ResultType[] = [];
   types = [ResultAnotationType.WALL, ResultAnotationType.ROOM, ResultAnotationType.WINDOW, ResultAnotationType.DOOR];
 
-  constructor(private readonly service: ResultsDataGridService) {
+  constructor(readonly service: ResultsDataGridService) {
     this.resultsData = assetsResults;
     this.lastSelectedColumns = this.service.getColumnsByType(this.selectedType);
     this.resultGrid = this.service.getDataByType(this.selectedType, this.resultsData);
+  }
+
+  changedData: Record<ResultAnotationType, any> = {
+    [ResultAnotationType.DOOR]: {},
+    [ResultAnotationType.WALL]: {},
+    [ResultAnotationType.WINDOW]: {},
+    [ResultAnotationType.ROOM]: {}
+  };
+
+  onDataSave(): void {
+    this.changedData[this.selectedType] = this.resultGrid;
   }
 
   onExporting(e: any) {
@@ -74,7 +85,16 @@ export class ResultsDataGridComponent {
 
   changeResultType(_event: MouseEvent, type: ResultAnotationType): void {
     this.lastSelectedColumns = this.service.getColumnsByType(type);
-    this.resultGrid = this.service.getDataByType(type, this.resultsData);
+
+    // Save page results to not parse all data everytime
+    if (!_.isEmpty(this.changedData[type])) {
+      this.resultGrid = this.changedData[type];
+    } else {
+      const data = this.service.getDataByType(type, this.resultsData);
+      this.changedData[type] = data;
+      this.resultGrid = data;
+    }
+
     this.selectedType = type;
   }
 }

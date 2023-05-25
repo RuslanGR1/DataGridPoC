@@ -7,7 +7,7 @@
         *ngFor="let type of types"
         (click)="changeResultType($event, type)"
       >
-        {{type}}'s Results
+        {{ service.getAnnotationNameByType(type) }}
       </button>
     </div>
     <div class="result">
@@ -33,6 +33,7 @@
     [allowColumnReordering]="true"
     [allowColumnResizing]="true"
     (onExporting)="onExporting($event)"
+    (onSaved)="onDataSave()"
   >
     <dxo-editing mode="row" [allowUpdating]="true" [allowDeleting]="true" [useIcons]="true"></dxo-editing>
     <dxo-search-panel [visible]="true" [highlightCaseSensitive]="true"></dxo-search-panel>
@@ -83,7 +84,7 @@
 
     <dxo-summary [recalculateWhileEditing]="true">
       <dxi-group-item column="length" summaryType="count" displayFormat="{0}"> </dxi-group-item>
-      <dxi-group-item column="length" summaryType="sum" [showInGroupFooter]="false" [alignByColumn]="true">
+      <dxi-group-item column="length" summaryType="sum" format [showInGroupFooter]="false" [alignByColumn]="true">
       </dxi-group-item>
 
       <dxi-group-item
