@@ -56,11 +56,29 @@ export class ResultsDataGridComponent {
     e.cancel = true;
   }
 
+  async processConfigFile(fileInput: any): Promise<void> {
+    const file: File = fileInput.files[0];
+    let fileReader: FileReader = new FileReader();
+    fileReader.onloadend = () => {
+      if (typeof fileReader?.result === 'string') {
+        const state = JSON.parse(fileReader.result);
+        this.dataGrid?.instance.state(state);
+      }
+    };
+    fileReader.readAsText(file);
+  }
+
   async processFile(fileInput: any): Promise<void> {
     const file: File = fileInput.files[0];
     const reader = new FileReader();
     reader.onload = this.onReaderLoad;
     reader.readAsText(file);
+  }
+
+  saveState(): void {
+    const state = this.dataGrid?.instance.state();
+    const blob = new Blob([JSON.stringify(state)], { type: 'text/plain;charset=utf-8' });
+    fs.saveAs(blob, 'state.json');
   }
 
   calculateSelectedRow(options: any) {

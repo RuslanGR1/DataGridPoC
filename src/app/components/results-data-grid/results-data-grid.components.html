@@ -26,6 +26,22 @@
     </div>
   </div>
 
+  <div class="additional-tools">
+    <button class="btn" (click)="saveState()">Save Config</button>
+    <div class="file-wrapper">
+      <input
+        #stateInput
+        type="file"
+        accept="appication/json"
+        (change)="processConfigFile(stateInput)"
+        id="config-file"
+        onclick="this.value=null;"
+        hidden
+      />
+      <label class="btn" for="config-file">Upload Config File</label>
+    </div>
+  </div>
+
   <dx-data-grid
     id="gridContainer"
     [dataSource]="resultGrid"
