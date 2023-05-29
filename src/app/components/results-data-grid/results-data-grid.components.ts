@@ -1,12 +1,13 @@
-import * as _ from 'lodash';
 import { Component, ViewChild } from '@angular/core';
-import { ResultsDataGridService } from './results-data-grid.service';
 import { DxDataGridComponent } from 'devextreme-angular';
-import { ResultAnotationType, ResultType } from './types';
 import { exportDataGrid } from 'devextreme/excel_exporter';
-import assetsResults from '../../../assets/results.json';
 import { Workbook } from 'exceljs';
 import fs from 'file-saver';
+import * as _ from 'lodash';
+import assetsResults from '../../../assets/results.json';
+import { ResultsDataGridService } from './results-data-grid.service';
+import { ResultAnnotationType, ResultType } from './types';
+import { Column } from 'devextreme/ui/data_grid';
 
 @Component({
   selector: 'results-data-grid',
@@ -18,10 +19,16 @@ export class ResultsDataGridComponent {
 
   resultsData: any = null;
   lastSelectedColumns: (string | undefined)[] | undefined = [];
-  defaultAnnotationType: ResultAnotationType = ResultAnotationType.WALL;
-  selectedType: ResultAnotationType = this.defaultAnnotationType;
+  defaultAnnotationType: ResultAnnotationType = ResultAnnotationType.WALL;
+  selectedType: ResultAnnotationType = this.defaultAnnotationType;
   resultGrid: ResultType[] = [];
-  types = [ResultAnotationType.WALL, ResultAnotationType.ROOM, ResultAnotationType.WINDOW, ResultAnotationType.DOOR];
+  columnCalcFunction: string = '';
+  types = [
+    ResultAnnotationType.WALL,
+    ResultAnnotationType.ROOM,
+    ResultAnnotationType.WINDOW,
+    ResultAnnotationType.DOOR
+  ];
   newColumnName: string = '';
 
   constructor(readonly service: ResultsDataGridService) {
@@ -30,11 +37,11 @@ export class ResultsDataGridComponent {
     this.resultGrid = this.service.getDataByType(this.selectedType, this.resultsData);
   }
 
-  changedData: Record<ResultAnotationType, any> = {
-    [ResultAnotationType.DOOR]: {},
-    [ResultAnotationType.WALL]: {},
-    [ResultAnotationType.WINDOW]: {},
-    [ResultAnotationType.ROOM]: {}
+  changedData: Record<ResultAnnotationType, any> = {
+    [ResultAnnotationType.DOOR]: {},
+    [ResultAnnotationType.WALL]: {},
+    [ResultAnnotationType.WINDOW]: {},
+    [ResultAnnotationType.ROOM]: {}
   };
 
   onDataSave(): void {
@@ -95,8 +102,25 @@ export class ResultsDataGridComponent {
   }
 
   addEmptyColumn(): void {
-    this.dataGrid?.instance.addColumn(this.newColumnName);
+    let calculateValue: ((data: any) => string | number) | undefined;
+    if (this.columnCalcFunction) {
+      calculateValue = eval(`
+        (function(data) {
+            return ${this.columnCalcFunction}
+        })
+      `);
+    } else {
+      calculateValue = undefined;
+    }
+
+    const newColumn: Column = {
+      caption: this.newColumnName,
+      fixed: false,
+      calculateCellValue: (data) => calculateValue && calculateValue(data)
+    };
+    this.dataGrid?.instance.addColumn(newColumn);
     this.newColumnName = '';
+    this.columnCalcFunction = '';
   }
 
   onReaderLoad = (ev: ProgressEvent<FileReader>) => {
@@ -107,7 +131,7 @@ export class ResultsDataGridComponent {
     this.resultGrid = this.service.getDataByType(this.defaultAnnotationType, this.resultsData);
   };
 
-  changeResultType(_event: MouseEvent, type: ResultAnotationType): void {
+  changeResultType(_event: MouseEvent, type: ResultAnnotationType): void {
     this.lastSelectedColumns = this.service.getColumnsByType(type);
 
     // Save page results to not parse all data everytime

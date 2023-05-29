@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { Injectable } from '@angular/core';
 import {
-  ResultAnotationType,
+  ResultAnnotationType,
   ResultType,
   Room,
   Wall,
@@ -28,33 +28,33 @@ export class ResultsDataGridService {
     return section;
   }
 
-  private readonly mapTypeToData: Record<ResultAnotationType, (res: any) => ResultType[]> = {
-    [ResultAnotationType.WALL]: (res) => this.getWalls(res),
-    [ResultAnotationType.ROOM]: (res) => this.getRooms(res),
-    [ResultAnotationType.WINDOW]: (res) => this.getWindows(res),
-    [ResultAnotationType.DOOR]: (res) => this.getDoors(res)
+  private readonly mapTypeToData: Record<ResultAnnotationType, (res: any) => ResultType[]> = {
+    [ResultAnnotationType.WALL]: (res) => this.getWalls(res),
+    [ResultAnnotationType.ROOM]: (res) => this.getRooms(res),
+    [ResultAnnotationType.WINDOW]: (res) => this.getWindows(res),
+    [ResultAnnotationType.DOOR]: (res) => this.getDoors(res)
   };
-  getDataByType(type: ResultAnotationType, results: any): ResultType[] {
+  getDataByType(type: ResultAnnotationType, results: any): ResultType[] {
     return this.mapTypeToData[type](results);
   }
 
-  private readonly mapTypeToColumns: Record<ResultAnotationType, string[]> = {
-    [ResultAnotationType.WALL]: wallValues,
-    [ResultAnotationType.ROOM]: roomValues,
-    [ResultAnotationType.WINDOW]: windowValues,
-    [ResultAnotationType.DOOR]: doorValues
+  private readonly mapTypeToColumns: Record<ResultAnnotationType, string[]> = {
+    [ResultAnnotationType.WALL]: wallValues,
+    [ResultAnnotationType.ROOM]: roomValues,
+    [ResultAnnotationType.WINDOW]: windowValues,
+    [ResultAnnotationType.DOOR]: doorValues
   };
-  getColumnsByType(type: ResultAnotationType): string[] {
+  getColumnsByType(type: ResultAnnotationType): string[] {
     return this.mapTypeToColumns[type];
   }
 
-  private readonly mapAnnotationNameByType: Record<ResultAnotationType, string> = {
-    [ResultAnotationType.WALL]: "Wall's Results",
-    [ResultAnotationType.ROOM]: "Room's Results",
-    [ResultAnotationType.WINDOW]: "Window's Results",
-    [ResultAnotationType.DOOR]: "Door's Results"
+  private readonly mapAnnotationNameByType: Record<ResultAnnotationType, string> = {
+    [ResultAnnotationType.WALL]: "Wall's Results",
+    [ResultAnnotationType.ROOM]: "Room's Results",
+    [ResultAnnotationType.WINDOW]: "Window's Results",
+    [ResultAnnotationType.DOOR]: "Door's Results"
   };
-  getAnnotationNameByType(type: ResultAnotationType): string {
+  getAnnotationNameByType(type: ResultAnnotationType): string {
     return this.mapAnnotationNameByType[type];
   }
 

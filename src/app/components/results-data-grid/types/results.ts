@@ -3,11 +3,11 @@ import { Room } from './room';
 import { Wall } from './wall';
 import { Window } from './window';
 
-export enum ResultAnotationType {
+export enum ResultAnnotationType {
   WALL = 'Wall',
   ROOM = 'Room',
   WINDOW = 'Window',
-  DOOR = 'Door',
+  DOOR = 'Door'
 }
 
 export type ResultType = Wall | Room | Window | Door;
