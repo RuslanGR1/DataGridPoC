@@ -126,7 +126,7 @@
 
   <div class="bottom-line">
     <button class="btn active" [disabled]="!this.newColumnName" (click)="addEmptyColumn()">Add Column</button>
-    <input class="add-column-input" [(ngModel)]="newColumnName" type="text" />
-    <input class="add-column-input" [(ngModel)]="columnCalcFunction" type="text" />
+    <input placeholder="caption" class="add-column-input" [(ngModel)]="newColumnName" type="text" />
+    <input placeholder="code" class="add-column-input" [(ngModel)]="columnCalcFunction" type="text" />
   </div>
 </div>
