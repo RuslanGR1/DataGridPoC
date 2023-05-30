@@ -50,6 +50,7 @@
     [allowColumnResizing]="true"
     (onExporting)="onExporting($event)"
     (onSaved)="onDataSave()"
+    [columns]="columns"
   >
     <dxo-editing mode="row" [allowUpdating]="true" [allowDeleting]="true" [useIcons]="true"></dxo-editing>
     <dxo-search-panel [visible]="true" [highlightCaseSensitive]="true"></dxo-search-panel>
@@ -57,34 +58,6 @@
     <dxo-group-panel [visible]="true"></dxo-group-panel>
     <dxo-grouping [autoExpandAll]="true"></dxo-grouping>
     <dxo-column-chooser [enabled]="true"></dxo-column-chooser>
-
-    <dxi-column dataField="page" [groupIndex]="0" [width]="50"></dxi-column>
-    <dxi-column dataField="section" [groupIndex]="1"></dxi-column>
-    <dxi-column dataField="drawingCode"></dxi-column>
-    <dxi-column dataField="drawingTitle"></dxi-column>
-    <dxi-column dataField="group" [groupIndex]="2"></dxi-column>
-    <dxi-column dataField="name"></dxi-column>
-    <dxi-column dataField="color" cellTemplate="cellTemplate"></dxi-column>
-
-    <dxi-column dataField="scale" [visible]="lastSelectedColumns?.includes('scale')"></dxi-column>
-    <dxi-column dataField="length" [visible]="lastSelectedColumns?.includes('length')"></dxi-column>
-
-    <dxi-column dataField="ceilingHeight" [visible]="lastSelectedColumns?.includes('ceilingHeight')"></dxi-column>
-    <dxi-column dataField="type" [visible]="lastSelectedColumns?.includes('type')"></dxi-column>
-    <dxi-column dataField="height" [visible]="lastSelectedColumns?.includes('height')"></dxi-column>
-    <dxi-column dataField="width" [visible]="lastSelectedColumns?.includes('width')"></dxi-column>
-    <dxi-column dataField="area" [visible]="lastSelectedColumns?.includes('area')"></dxi-column>
-    <dxi-column dataField="doorLeft" [visible]="lastSelectedColumns?.includes('doorLeft')"></dxi-column>
-    <dxi-column dataField="material" [visible]="lastSelectedColumns?.includes('material')"></dxi-column>
-    <dxi-column dataField="hardware" [visible]="lastSelectedColumns?.includes('hardware')"></dxi-column>
-    <dxi-column
-      dataField="singleDouble"
-      caption="Single/Double"
-      [visible]="lastSelectedColumns?.includes('singleDouble')"
-    ></dxi-column>
-
-    <dxi-column dataField="repeat" [visible]="lastSelectedColumns?.includes('repeat')"></dxi-column>
-    <dxi-column dataField="comment" [visible]="lastSelectedColumns?.includes('comment')"></dxi-column>
 
     <dxo-load-panel [enabled]="true"></dxo-load-panel>
     <dxo-scrolling mode="virtual"></dxo-scrolling>
@@ -125,8 +98,16 @@
   </div>
 
   <div class="bottom-line">
-    <button class="btn active" [disabled]="!this.newColumnName" (click)="addEmptyColumn()">Add Column</button>
-    <input placeholder="caption" class="add-column-input" [(ngModel)]="newColumnName" type="text" />
-    <input placeholder="code" class="add-column-input" [(ngModel)]="columnCalcFunction" type="text" />
+    <div class="colname">
+      <button class="btn active" [disabled]="!this.newColumnName" (click)="addEmptyColumn()">Add Column</button>
+      <input placeholder="caption" class="add-column-input" [(ngModel)]="newColumnName" type="text" />
+    </div>
+
+    <textarea
+      placeholder="code"
+      class="add-column-input column-code"
+      [(ngModel)]="columnCalcFunction"
+      type="text"
+    ></textarea>
   </div>
 </div>

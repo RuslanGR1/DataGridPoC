@@ -26,6 +26,17 @@
 }
 
 .bottom-line {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 150px;
+}
+
+.column-code {
+  width: 500px;
+  height: 200px;
+}
+
+.colname {
   margin-top: 20px;
   display: flex;
   gap: 8px;

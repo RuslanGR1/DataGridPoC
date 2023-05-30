@@ -6,7 +6,7 @@ import fs from 'file-saver';
 import * as _ from 'lodash';
 import assetsResults from '../../../assets/results.json';
 import { ResultsDataGridService } from './results-data-grid.service';
-import { ResultAnnotationType, ResultType } from './types';
+import { ResultAnnotationType, ResultType, doorColumns, roomColumns, wallColumns, windowColumns } from './types';
 import { Column } from 'devextreme/ui/data_grid';
 
 @Component({
@@ -17,8 +17,8 @@ import { Column } from 'devextreme/ui/data_grid';
 export class ResultsDataGridComponent {
   @ViewChild(DxDataGridComponent) dataGrid?: DxDataGridComponent;
 
+  columns: Column[];
   resultsData: any = null;
-  lastSelectedColumns: (string | undefined)[] | undefined = [];
   defaultAnnotationType: ResultAnnotationType = ResultAnnotationType.WALL;
   selectedType: ResultAnnotationType = this.defaultAnnotationType;
   resultGrid: ResultType[] = [];
@@ -33,16 +33,26 @@ export class ResultsDataGridComponent {
 
   constructor(readonly service: ResultsDataGridService) {
     this.resultsData = assetsResults;
-    this.lastSelectedColumns = this.service.getColumnsByType(this.selectedType);
+    this.columns = this.getColumnsByType(this.selectedType);
     this.resultGrid = this.service.getDataByType(this.selectedType, this.resultsData);
   }
 
-  changedData: Record<ResultAnnotationType, any> = {
+  changedData: Record<ResultAnnotationType | string, any> = {
     [ResultAnnotationType.DOOR]: {},
     [ResultAnnotationType.WALL]: {},
     [ResultAnnotationType.WINDOW]: {},
     [ResultAnnotationType.ROOM]: {}
   };
+
+  changedColumns: Record<ResultAnnotationType | string, Column[]> = {
+    [ResultAnnotationType.DOOR]: doorColumns,
+    [ResultAnnotationType.WALL]: wallColumns,
+    [ResultAnnotationType.WINDOW]: windowColumns,
+    [ResultAnnotationType.ROOM]: roomColumns
+  };
+  getColumnsByType(type: string): Column[] {
+    return this.changedColumns[type];
+  }
 
   onDataSave(): void {
     this.changedData[this.selectedType] = this.resultGrid;
@@ -118,7 +128,7 @@ export class ResultsDataGridComponent {
       fixed: false,
       calculateCellValue: (data) => calculateValue && calculateValue(data)
     };
-    this.dataGrid?.instance.addColumn(newColumn);
+    this.columns.push(newColumn);
     this.newColumnName = '';
     this.columnCalcFunction = '';
   }
@@ -127,14 +137,13 @@ export class ResultsDataGridComponent {
     const obj = JSON.parse(<string>ev.target?.result);
     this.resultsData = obj;
     this.selectedType = this.defaultAnnotationType;
-    this.lastSelectedColumns = this.service.getColumnsByType(this.defaultAnnotationType);
     this.resultGrid = this.service.getDataByType(this.defaultAnnotationType, this.resultsData);
   };
 
   changeResultType(_event: MouseEvent, type: ResultAnnotationType): void {
-    this.lastSelectedColumns = this.service.getColumnsByType(type);
+    this.dataGrid?.instance.clearGrouping();
+    this.columns = this.getColumnsByType(type);
 
-    // Save page results to not parse all data everytime
     if (!_.isEmpty(this.changedData[type])) {
       this.resultGrid = this.changedData[type];
     } else {

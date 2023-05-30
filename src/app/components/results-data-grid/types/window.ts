@@ -1,3 +1,6 @@
+import { Column } from 'devextreme/ui/data_grid';
+import { dataFields } from './results';
+
 export interface Window {
   page: number;
   section: string;
@@ -19,5 +22,17 @@ export const windowValues = [
   'name',
   'color',
   'repeat',
-  'comment',
+  'comment'
+];
+
+export const windowColumns: Column[] = [
+  { dataField: dataFields.page, width: '50', groupIndex: 0 },
+  { dataField: dataFields.section, width: '50', groupIndex: 1 },
+  { dataField: dataFields.drawingCode },
+  { dataField: dataFields.drawingTitle },
+  { dataField: dataFields.group, width: '50', groupIndex: 2 },
+  { dataField: dataFields.name },
+  { dataField: dataFields.color, cellTemplate: 'cellTemplate' },
+  { dataField: dataFields.repeat },
+  { dataField: dataFields.comment }
 ];
